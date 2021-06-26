@@ -141,7 +141,10 @@ func (kms SecretsMetadataKMS) EncryptDEK(volumeID, plainDEK string) (string, err
 	if err != nil {
 		return "", fmt.Errorf("failed to get passphrase: %w", err)
 	}
+	return encryptDEKWithPassphrase(volumeID, plainDEK, passphrase)
+}
 
+func encryptDEKWithPassphrase(volumeID, plainDEK, passphrase string) (string, error) {
 	aead, err := generateCipher(passphrase, volumeID)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cipher: %w", err)
@@ -171,7 +174,10 @@ func (kms SecretsMetadataKMS) DecryptDEK(volumeID, encryptedDEK string) (string,
 	if err != nil {
 		return "", fmt.Errorf("failed to get passphrase: %w", err)
 	}
+	return decryptDEKWithPassphrase(volumeID, encryptedDEK, passphrase)
+}
 
+func decryptDEKWithPassphrase(volumeID, encryptedDEK, passphrase string) (string, error) {
 	aead, err := generateCipher(passphrase, volumeID)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cipher: %w", err)
