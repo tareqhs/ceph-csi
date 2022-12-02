@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	kmsapi "github.com/ceph/ceph-csi/internal/kms"
@@ -293,7 +294,7 @@ func (rv *rbdVolume) openEncryptedDevice(ctx context.Context, devicePath string)
 	if isOpen {
 		log.DebugLog(ctx, "encrypted device is already open at %s", mapperFilePath)
 	} else {
-		err = util.OpenEncryptedVolume(ctx, devicePath, mapperFile, passphrase)
+		err = util.OpenEncryptedVolume(ctx, devicePath, mapperFile, passphrase, rv.EncryptionDiscards)
 		if err != nil {
 			log.ErrorLog(ctx, "failed to open device %s: %v",
 				rv, err)
@@ -320,6 +321,16 @@ func (ri *rbdImage) initKMS(ctx context.Context, volOptions, credentials map[str
 		return fmt.Errorf("invalid encryption type")
 	case util.EncryptionTypeNone:
 		return nil
+	}
+
+	if err == nil {
+		if discardStr, ok := credentials["encryptionDiscard"]; ok {
+			if parsed, parseErr := strconv.ParseBool(discardStr); parseErr == nil {
+				ri.EncryptionDiscards = parsed
+			} else {
+				err = fmt.Errorf("invalid value for option 'encryptionDiscard': %w", parseErr)
+			}
+		}
 	}
 
 	if err != nil {

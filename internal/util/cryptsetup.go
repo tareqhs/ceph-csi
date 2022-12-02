@@ -39,10 +39,14 @@ func LuksFormat(devicePath, passphrase string) (string, string, error) {
 }
 
 // LuksOpen opens LUKS encrypted partition and sets up a mapping.
-func LuksOpen(devicePath, mapperFile, passphrase string) (string, string, error) {
+func LuksOpen(devicePath, mapperFile, passphrase string, discards bool) (string, string, error) {
 	// cryptsetup option --disable-keyring (introduced with cryptsetup v2.0.0)
 	// will be ignored with luks1
-	return execCryptsetupCommand(&passphrase, "luksOpen", devicePath, mapperFile, "--disable-keyring", "-d", "/dev/stdin")
+	args := []string{"luksOpen", devicePath, mapperFile, "--disable-keyring", "-d", "/dev/stdin"}
+	if discards {
+		args = append(args, "--allow-discards")
+	}
+	return execCryptsetupCommand(&passphrase, args...)
 }
 
 // LuksResize resizes LUKS encrypted partition.

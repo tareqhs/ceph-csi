@@ -139,6 +139,9 @@ type rbdImage struct {
 
 	CreatedAt *timestamp.Timestamp
 
+	// if this is an encrypted image, whether disacrds option is enabled in the device mapper
+	EncryptionDiscards bool
+
 	// conn is a connection to the Ceph cluster obtained from a ConnPool
 	conn *util.ClusterConnection
 	// an opened IOContext, call .openIoctx() before using
