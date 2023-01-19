@@ -1,3 +1,5 @@
+# IBM Cloud Go SDK Version 0.9.2
+
 # keyprotect-go-client
 
 [![Build Status](https://travis-ci.com/IBM/keyprotect-go-client.svg?branch=master)](https://travis-ci.com/IBM/keyprotect-go-client)
@@ -338,4 +340,35 @@ if err != nil {
     fmt.Println(err)
 }
 fmt.Println(keys)
+```
+
+### Support for Adding Custom Header
+
+
+1) From ServiceClient (For Every API Call)
+```go
+cc := kp.ClientConfig{
+    BaseURL:    "BASE_URL",
+    APIKey:     "API_KEY",
+    InstanceID: "INSTANCE_ID",
+    Headers: http.Header{
+      "Custom-Header":  {"Custom-Value"},
+    },
+  }
+```
+
+2) From ServiceCall (Per API Call)
+
+* Define Header just before the API Call and Empty out when done.
+
+```go
+client.Config.Headers = make(http.Header))
+client.Config.Headers.Set("Custom-Header", "Custom-Header-Value")
+
+key, err := client.CreateKey(params)
+  if err != nil {
+    panic(err)
+  }
+
+client.Config.Headers = http.Header{}
 ```
